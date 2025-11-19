@@ -1,0 +1,66 @@
+<main class="min-h-screen bg-gray-900 text-gray-200 font-sans p-4 sm:p-6 lg:p-8">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <header class="mb-8 text-center">
+      <h1 class="text-4xl sm:text-5xl font-bold text-white tracking-tight">
+        RPi Sensor Dashboard
+      </h1>
+      <p class="mt-2 text-lg text-gray-400">
+        Live data from your local environment
+      </p>
+    </header>
+
+    <!-- Status & Error Display -->
+    <div class="mb-6 h-10 flex items-center justify-center">
+      @if (error()) {
+        <div class="bg-red-900/50 border border-red-700 text-red-300 px-4 py-2 rounded-lg text-sm flex items-center space-x-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          <span>{{ error() }}</span>
+        </div>
+      } @else if (lastUpdated()) {
+        <p class="text-gray-500 text-sm">
+          Last updated: {{ getFormattedTime() }}
+        </p>
+      }
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Sensor Cards -->
+      <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <app-sensor-card
+          label="Temperature"
+          [value]="sensorData().temperature"
+          unit="°C"
+          [icon]="temperatureIcon"
+          [isLoading]="isLoading()"
+        />
+        <app-sensor-card
+          label="Humidity"
+          [value]="sensorData().humidity"
+          unit="%"
+          [icon]="humidityIcon"
+          [isLoading]="isLoading()"
+        />
+      </div>
+
+      <!-- Control Panel -->
+      <div class="md:col-span-1">
+        <app-led-control [ledState]="ledState()" (action)="handleLedAction($event)" />
+      </div>
+    </div>
+    
+    <!-- Footer/Instructions -->
+    <footer class="mt-12 text-center text-gray-600 text-sm">
+      <div class="bg-gray-800/50 border border-gray-700 p-4 rounded-lg max-w-2xl mx-auto">
+        <p class="font-semibold text-gray-400 mb-2">Configuration Note</p>
+        <p>This app is trying to connect to a backend at <code class="bg-gray-700 text-cyan-400 px-1 py-0.5 rounded">http://localhost:5000</code>. If your Raspberry Pi has a different IP address, please update the <code class="bg-gray-700 text-cyan-400 px-1 py-0.5 rounded">API_URL</code> constant in <code class="bg-gray-700 text-cyan-400 px-1 py-0.5 rounded">src/services/sensor.service.ts</code>.</p>
+      </div>
+    </footer>
+
+  </div>
+</main>
