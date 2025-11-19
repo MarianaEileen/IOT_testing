@@ -20,9 +20,9 @@
           </svg>
           <span>{{ error() }}</span>
         </div>
-      } @else if (lastUpdated()) {
+      } @else if (sensorData().timestamp) {
         <p class="text-gray-500 text-sm">
-          Last updated: {{ getFormattedTime() }}
+          Last reading at: {{ sensorData().timestamp }}
         </p>
       }
     </div>

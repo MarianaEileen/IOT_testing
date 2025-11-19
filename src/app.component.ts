@@ -4,6 +4,7 @@ import { SensorService, SensorData } from './services/sensor.service';
 import { SensorCardComponent } from './components/sensor-card/sensor-card.component';
 import { LedControlComponent } from './components/led-control/led-control.component';
 import { catchError, finalize, of, tap } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -17,11 +18,10 @@ export class AppComponent implements OnInit, OnDestroy {
   private pollingInterval: any;
 
   // Signals for state management
-  sensorData = signal<Partial<SensorData>>({ temperature: null, humidity: null });
+  sensorData = signal<Partial<SensorData>>({ temperature: null, humidity: null, timestamp: null });
   ledState = signal<'on' | 'off' | 'unknown'>('unknown');
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
-  lastUpdated = signal<Date | null>(null);
   
   // Icon paths for sensor cards
   temperatureIcon = 'M13 16V3a1 1 0 00-1-1H9a1 1 0 00-1 1v13a4 4 0 105 0zM9 4h2v9H9V4z';
@@ -47,15 +47,18 @@ export class AppComponent implements OnInit, OnDestroy {
           this.sensorData.set({
             temperature: data.temperature,
             humidity: data.humidity,
+            timestamp: data.timestamp, // Store the timestamp from the API
           });
-          this.lastUpdated.set(new Date());
         } else {
-          this.handleError(data.error || 'Failed to get sensor data.');
+          const errorMessage = typeof data.error === 'string'
+              ? data.error
+              : 'The backend returned a successful response but with an unspecified error.';
+          this.handleError(errorMessage);
         }
       }),
-      catchError(err => {
+      catchError((err: unknown) => {
         console.error('API Error:', err);
-        this.handleError('Could not connect to the sensor API. Make sure the backend is running and the API URL is correct.');
+        this.handleApiError(err);
         return of(null);
       }),
       finalize(() => {
@@ -71,25 +74,37 @@ export class AppComponent implements OnInit, OnDestroy {
     this.ledState.set(action);
 
     this.sensorService.controlLed(action).pipe(
-      catchError(err => {
+      catchError((err: unknown) => {
         console.error('LED Control Error:', err);
         // Revert UI on error
         this.ledState.set(previousState);
-        this.handleError('Failed to control LED.');
+        this.handleApiError(err, 'Failed to control LED.');
         return of(null);
       })
     ).subscribe();
   }
 
-  private handleError(errorMessage: string): void {
-    this.error.set(errorMessage);
-    this.sensorData.set({ temperature: null, humidity: null });
+  private handleApiError(err: unknown, context: string = 'Could not connect to the sensor API.'): void {
+      let errorMessage = context;
+
+      if (err instanceof HttpErrorResponse) {
+        if (err.status === 0) {
+          // This is a client-side or network error, often CORS.
+          errorMessage = 'Network Error or CORS Issue. Ensure the Flask backend has CORS enabled and is accessible.';
+        } else {
+          // This is a server-side error.
+          errorMessage = `Backend returned code ${err.status}: ${err.statusText}. Please check server logs.`;
+        }
+      } else if (err instanceof Error) {
+        // Handle standard JavaScript Error objects
+        errorMessage = err.message;
+      }
+      
+      this.handleError(errorMessage);
   }
 
-  // Helper method for template to avoid new Date()
-  getFormattedTime(): string | null {
-    const date = this.lastUpdated();
-    if (!date) return null;
-    return date.toLocaleTimeString();
+  private handleError(errorMessage: string): void {
+    this.error.set(errorMessage);
+    this.sensorData.set({ temperature: null, humidity: null, timestamp: null });
   }
 }
