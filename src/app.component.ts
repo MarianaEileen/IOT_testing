@@ -49,11 +49,19 @@ export class AppComponent implements OnInit, OnDestroy {
             humidity: data.humidity,
             timestamp: data.timestamp, // Store the timestamp from the API
           });
+          this.error.set(null); // Clear any previous errors
         } else {
-          const errorMessage = typeof data.error === 'string'
-              ? data.error
-              : 'The backend returned a successful response but with an unspecified error.';
-          this.handleError(errorMessage);
+          // No data found in database - show friendly message
+          const errorMessage = data.error === 'No sensor data found'
+              ? '⏳ Esperando datos del sensor... La base de datos está vacía.'
+              : (typeof data.error === 'string'
+                  ? data.error
+                  : 'The backend returned a successful response but with an unspecified error.');
+          this.error.set(errorMessage);
+          // Keep previous data if exists, otherwise null
+          if (!this.sensorData().temperature) {
+            this.sensorData.set({ temperature: null, humidity: null, timestamp: null });
+          }
         }
       }),
       catchError((err: unknown) => {
@@ -105,6 +113,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private handleError(errorMessage: string): void {
     this.error.set(errorMessage);
-    this.sensorData.set({ temperature: null, humidity: null, timestamp: null });
+    // Don't clear data - keep showing last known values
+    // Only clear if there was never any data
+    if (!this.sensorData().temperature && !this.sensorData().humidity) {
+      this.sensorData.set({ temperature: null, humidity: null, timestamp: null });
+    }
   }
 }

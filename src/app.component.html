@@ -12,17 +12,36 @@
     </header>
 
     <!-- Status & Error Display -->
-    <div class="mb-6 h-10 flex items-center justify-center">
+    <div class="mb-6 min-h-10 flex items-center justify-center">
       @if (error()) {
-        <div class="bg-red-900/50 border border-red-700 text-red-300 px-4 py-2 rounded-lg text-sm flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
-          <span>{{ error() }}</span>
-        </div>
+        <!-- Check if it's a "waiting for data" message or actual error -->
+        @if (error()!.includes('Esperando datos')) {
+          <div class="bg-yellow-900/30 border border-yellow-700/50 text-yellow-300 px-4 py-2 rounded-lg text-sm flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" stroke-width="2" stroke-dasharray="32" stroke-dashoffset="0">
+                <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+            <span>{{ error() }}</span>
+          </div>
+        } @else {
+          <div class="bg-red-900/50 border border-red-700 text-red-300 px-4 py-2 rounded-lg text-sm flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            <span>{{ error() }}</span>
+          </div>
+        }
       } @else if (sensorData().timestamp) {
+        <div class="flex items-center space-x-2 text-gray-500 text-sm">
+          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <p>
+            Última lectura: {{ sensorData().timestamp }}
+          </p>
+        </div>
+      } @else if (isLoading()) {
         <p class="text-gray-500 text-sm">
-          Last reading at: {{ sensorData().timestamp }}
+          Conectando al sensor...
         </p>
       }
     </div>

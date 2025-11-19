@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+.angular/
+
+# Environment variables
+.env
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +26,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Testing
+coverage/
+.nyc_output/

@@ -1,5 +1,0 @@
-{
-  "name": "RPi Sensor Dashboard",
-  "description": "A modern dashboard to visualize sensor data (temperature, humidity) and control an LED connected to a Raspberry Pi. This app is designed to work with a Python Flask backend.",
-  "requestFramePermissions": []
-}

@@ -16,9 +16,9 @@ export interface SensorData {
 export class SensorService {
   private http = inject(HttpClient);
 
-  // IMPORTANT: Replace 'http://localhost:5000' with your Raspberry Pi's IP address.
-  // For example: 'http://192.168.1.100:5000'
-  private readonly API_URL = 'http://78.12.149.93';
+  // API URL - siempre usa localhost:5000 porque el navegador
+  // accede desde fuera del contenedor Docker
+  private readonly API_URL = 'http://localhost:5000/api';
 
   getSensorData(): Observable<SensorData> {
     return this.http.get<SensorData>(`${this.API_URL}/sensor`);

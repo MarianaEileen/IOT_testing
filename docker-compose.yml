@@ -1,0 +1,25 @@
+services:
+  # Todo en un solo contenedor (Frontend + Backend)
+  app:
+    build:
+      context: .
+    container_name: iot-dashboard
+    ports:
+      - "4200:4200"  # Frontend Angular
+      - "5000:5000"  # Backend API
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_SSL=${DB_SSL}
+      - CORS_ORIGIN=http://localhost:4200
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+      - ./server:/app/server
+    restart: unless-stopped
