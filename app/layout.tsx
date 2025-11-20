@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   description: "Sistema de monitoreo de condiciones ambientales y calidad del sueño",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
