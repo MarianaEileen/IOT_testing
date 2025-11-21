@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { BarChart3 } from "lucide-react"
 import { StatusIndicator } from "./status-indicator"
+import { DbStatusIndicator } from "./db-status-indicator"
 import { cn } from "@/lib/utils"
 
 const navigation = [
@@ -52,11 +53,14 @@ export function Header({ isOnline = true, lastUpdate = "hace 30 seg" }: HeaderPr
           </nav>
 
           {/* Estado de conexión */}
-          <StatusIndicator
-            isOnline={isOnline}
-            lastUpdate={lastUpdate}
-            className="text-text-light"
-          />
+          <div className="flex items-center gap-4">
+            <DbStatusIndicator className="text-text-light" />
+            <StatusIndicator
+              isOnline={isOnline}
+              lastUpdate={lastUpdate}
+              className="text-text-light"
+            />
+          </div>
         </div>
 
         {/* Navegación móvil */}

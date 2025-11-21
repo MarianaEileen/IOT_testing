@@ -53,10 +53,10 @@ function generateMockSleepData(fecha: string): AnalisisSueno {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { fecha: string } }
+  { params }: { params: Promise<{ fecha: string }> }
 ) {
   try {
-    const { fecha } = params
+    const { fecha } = await params
 
     // Validar formato de fecha YYYY-MM-DD
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {

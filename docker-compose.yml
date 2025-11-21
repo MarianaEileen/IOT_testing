@@ -5,7 +5,7 @@ services:
     build: .
     container_name: zenalyze
     ports:
-      - "3000:3000"
+      - "3003:3000"
     environment:
       # Configuración de base de datos (editar en .env.local)
       DB_HOST: ${DB_HOST:-78.12.149.93}
